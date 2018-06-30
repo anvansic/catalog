@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <title>The Encyclopedia of Books</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+    </script>
+    <script src="//apis.google.com/js/platform.js?onload=start">
+    </script>
+    <link href="../static/styles.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <nav>
+      <span id="site-name">The Encyclopedia of Books</span>
+    </nav>
+    <div id="main-window">
+      <div id="signinButton">
+        <span class="g-signin"
+          data-scope="openid email"
+          data-clientid="728227667682-nj0hfki6e8o09i0t1a0te12af33r4uqp.apps.googleusercontent.com"
+          data-redirecturi="http://localhost:8000"
+          data-accesstype="offline"
+          data-cookiepolicy="single_host_origin"
+          data-callback="signInCallback"
+          data-approvalprompt="force">
+        </span>
+      </div>
+      <div id="result"></div>
+    </div>
+
+    <script>
+    function signInCallback(authResult) {
+      if(authResult['code']) {
+        $('#signinButton').attr('style', 'display: none');
+        $.ajax({
+          type: 'POST',
+          url: '/gconnect?state={{ STATE }}',
+          processData: false,
+          contentType: 'application/octet-stream; charset=utf-8',
+          data: authResult['code'],
+          success: function(result) {
+            if(result) {
+              $('#result').html('Login Successful<br>'+result+'<br>Redirecting...')
+              setTimeout(function() {
+                window.location.href = '/';
+              }, 4000);
+            }
+            else if(authResult['error']) {
+              console.log('Error: ' + authResult['error']);
+            }
+            else {
+              $('#result').html('Failed to make a server side call.');
+            }
+          }
+        });
+      }
+    }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <title>The Encyclopedia of Books</title>
+    <link href="/../static/styles.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body>
+    <nav>
+      <span id="site-name">The Encyclopedia of Books</span>
+    </nav>
+    <h1>Edit Entry Form</h1>
+    <p>Fill in the following form to change the selected entry.</p>
+    <br>
+    <form id="entry-form" method="post">
+      <ul>
+        <li><label for="title">Title: </label>
+        <input class="form-field" type="text" maxlength="72" name="title" value="{{ entry.title }}"></li>
+        <li><label for="author">Author: </label>
+        <input class="form-field" type="text" maxlength="30" name="author" value="{{ entry.author }}"></li>
+        <li><label for="year">Year Published: </label>
+        <input class="form-field" type="text" maxlength="5" name="year" placeholder="(range -2700 to 2018)" value="{{ entry.year }}"></li>
+        <li><label for="genre">Genre: </label>
+        <select class="form-field" name = "genre" placeholder="Choose a genre">
+          <option value="Fantasy" {% if entry.genre == "Fantasy" %} selected {% endif %}>Fantasy</option>
+          <option value="Horror" {% if entry.genre == "Horror" %} selected {% endif %}>Horror</option>
+          <option value="Biography" {% if entry.genre == "Biography" %} selected {% endif %}>Biography</option>
+          <option value="Sci-Fi" {% if entry.genre == "Sci-Fi" %} selected {% endif %}>Sci-Fi</option>
+          <option value="Travel" {% if entry.genre == "Travel" %} selected {% endif %}>Travel</option>
+          <option value="Romance" {% if entry.genre == "Romance" %} selected {% endif %}>Romance</option>
+          <option value="Cookbook" {% if entry.genre == "Cookbook" %} selected {% endif %}>Cookbook</option>
+          <option value="Historical Fiction" {% if entry.genre == "Historical Fiction" %} selected {% endif %}>Historical Fiction</option>
+          <option value="Historical Non-Fiction" {% if entry.genre == "Historical Non-Fiction" %} selected {% endif %}>Historical Non-Fiction</option>
+        </select></li>
+        <li><label for="synopsis">Synopsis: </label></li>
+        <li><textarea class="form-field" type="text" rows="8" cols="40" maxlength="200" name="synopsis" placeholder="(max 200 characters)">{{ entry.synopsis }}</textarea></li>
+        <li><button type="submit" value="Edit Entry">Edit Entry</button></li>
+      </ul>
+    </form>
+  </body>
+</html>

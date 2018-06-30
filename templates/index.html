@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <title>The Encyclopedia of Books</title>
+    <link href="../static/styles.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body>
+    <nav>
+      <span id="site-name">The Encyclopedia of Books</span>
+      {{ loginout|safe }}
+    </nav>
+    <div id="main-window">
+      {{ welcome_message|safe }}
+      <br><br><br>
+      <div id="entry-window">
+        {{ create_entry_html|safe }}
+        <br>
+        <ul>
+          {% for entry in entry_list %}
+            <li><a href='{{ url_for('view_entry', id=entry.id) }}'>{{ entry.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

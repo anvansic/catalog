@@ -1,0 +1,57 @@
+body {
+  background-color: gray;
+}
+
+nav {
+  background-color: darkblue;
+  font-family: 'Century Gothic', sans-serif;
+}
+
+a:visited {
+  color: yellow;
+}
+
+#site-name {
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+}
+
+#login-link {
+  float: right;
+  font-size: 20px;
+  font-family: 'Century Gothic';
+}
+
+#logout-link {
+  float: right;
+  font-size: 20px;
+  font-family: 'Century Gothic';
+}
+
+#main-window {
+  margin-left: 2%;
+  margin-right: 2%;
+  margin-top: 8px;
+  margin-bottom: 2%;
+  height: 100%;
+  color: white;
+}
+
+#entry-info {
+  
+}
+
+h1 {
+  font-family: 'Century Gothic', sans-serif;
+  color: white;
+}
+
+ul {
+  list-style: none;
+}
+
+.form-field {
+  padding: 2px;
+  margin: 2px;
+}

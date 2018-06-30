@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <title>The Encyclopedia of Books</title>
+    <link href="../static/styles.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body>
+    <nav>
+      <span id="site-name">The Encyclopedia of Books</span>
+    </nav>
+    <h1>New Entry Form</h1>
+    <p>Fill in the following form to add a new book entry to the Encyclopedia. <strong>All fields are required.</strong></p>
+    <br>
+    <form id="entry-form" method="post">
+      <ul>
+        <li><label for="title">Title: </label>
+        <input class="form-field" type="text" maxlength="72" name="title"></li>
+        <li><label for="author">Author: </label>
+        <input class="form-field" type="text" maxlength="30" name="author"></li>
+        <li><label for="year">Year Published: </label>
+        <input class="form-field" type="text" maxlength="5" name="year" placeholder="(range -2700 to 2018)"></li>
+        <li><label for="genre">Genre: </label>
+        <select class="form-field" name = "genre" placeholder="Choose a genre">
+          <option value="Fantasy">Fantasy</option>
+          <option value="Horror">Horror</option>
+          <option value="Biography">Biography</option>
+          <option value="Sci-Fi">Sci-Fi</option>
+          <option value="Travel">Travel</option>
+          <option value="Romance">Romance</option>
+          <option value="Cookbook">Cookbook</option>
+          <option value="Historical Fiction">Historical Fiction</option>
+          <option value="Historical Non-Fiction">Historical Non-Fiction</option>
+        </select></li>
+        <li><label for="synopsis">Synopsis: </label></li>
+        <li><textarea class="form-field" type="text" rows="8" cols="40" maxlength="200" name="synopsis" placeholder="(max 200 characters)"></textarea></li>
+        <li><button type="submit" value="Create Entry">Create Entry</button></li>
+      </ul>
+    </form>
+  </body>
+</html>

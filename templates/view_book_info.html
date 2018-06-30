@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>The Encyclopedia of Books</title>
+    <link href="../../static/styles.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body>
+    <nav>
+      <span id="site-name">The Encyclopedia of Books</span>
+    </nav>
+    <h1>Information on "{{ entry.title }}"</h1>
+    <div id="entry-info">
+      <p><strong>Author: </strong>{{ entry.author }}</p>
+      <p><strong>Year Published: </strong>{{ displayed_year }}</p>
+      <p><strong>Genre: </strong>{{ entry.genre }}</p>
+      <p><strong>Synopsis: </strong>{{ entry.synopsis }}</p>
+    </div>
+    <div id="entry-options">
+      <a href='{{ url_for('go_home') }}'>Back</a>
+      <a href='{{ url_for('view_json', id=entry.id) }}'>View JSON Endpoint</a>
+      {{ logged_in_options|safe }}
+    </div>
+  </body>
+</html>
