@@ -5,7 +5,8 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from models import Base, Book
 from flask import session as login_session
-import random, string
+import random
+import string
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 import httplib2
 import json
@@ -22,14 +23,17 @@ session = scoped_session(DBSession)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "L0cMW5fcd48dbhcNr8EQkSkd"
 
+
 @app.route('/', methods=['GET'])
 def go_home():
 
     welcome_message = "This is the Encyclopedia of Books homepage. <br><br>"
-    welcome_message += "From here, you can view lists of books sorted by their "
+    welcome_message += ("From here, you can view lists of " +
+                        "books sorted by their ")
     welcome_message += "genres. If you'd like, you can also login using your "
     welcome_message += "Google account credentials, "
-    welcome_message += "which will then give you the privilege to add, edit or "
+    welcome_message += ("which will then give you the " +
+                        "privilege to add, edit or ")
     welcome_message += "delete titles. Thank you for visiting, and enjoy!"
     welcome_message += "<br><br>"
     welcome_message += "<em>DISCLAIMER:</em> The Encyclopedia of Books has "
@@ -38,12 +42,12 @@ def go_home():
 
     # Sets up which links are visible based on login status.
     if login_session.get('credentials') is not None:
-        loginout = ("<a id='logout-link' href="+
+        loginout = ("<a id='logout-link' href=" +
                     url_for('gdisconnect')+">Logout</a>")
-        create_entry_html = ("<a id='link-create-entry' href="+
-                             url_for('create_entry')+">New Entry</a>")
+        create_entry_html = ("<a id='link-create-entry' href=" +
+                             url_for('create_entry') + ">New Entry</a>")
     else:
-        loginout = ("<a id='login-link' href="+url_for('login_user')+
+        loginout = ("<a id='login-link' href="+url_for('login_user') +
                     ">Login with Google+</a>")
         create_entry_html = ""
 
@@ -54,12 +58,14 @@ def go_home():
                            create_entry_html=create_entry_html,
                            entry_list=entry_list)
 
+
 @app.route('/login')
 def login_user():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
     return render_template('login.html', STATE=state)
+
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -73,7 +79,8 @@ def gconnect():
     try:
         oauth_flow = flow_from_clientsecrets('client_secrets.json',
                                              scope='openid email',
-                                             redirect_uri='http://localhost:8000')
+                                             redirect_uri=('http://' +
+                                                           'localhost:8000'))
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
         response = make_response(json.dumps("No credentials object created."),
@@ -99,7 +106,8 @@ def gconnect():
         return response
 
     if result['issued_to'] != CLIENT_ID:
-        response = make_response(json.dumps("Token's client ID doesn't match."),
+        response = make_response(json.dumps("Token's client " +
+                                 "ID doesn't match."),
                                  401)
         response.header['Content-type'] = 'application/json'
         return response
@@ -127,12 +135,14 @@ def gconnect():
         login_session['username'] = data['name']
         return "You are now signed in as %s" % login_session['username']
 
+
 @app.route('/gdisconnect')
 def gdisconnect():
     # gdisconnect code and functionality also courtesy of Udacity.
     access_token = login_session.get('credentials')
     if access_token is None:
-        response = make_response(json.dumps("Current user not connected."), 401)
+        response = make_response(json.dumps("Current user not " +
+                                            "connected."), 401)
         response.headers['Content-type'] = 'application/json'
         return response
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
@@ -151,13 +161,14 @@ def gdisconnect():
     else:
         # If an error occurs, the login_session fields are nullified anyway
         # to get the application "back on track".
-        response = make_response(json.dumps("Could not revoke token. "+
+        response = make_response(json.dumps("Could not revoke token. " +
                                  "Credentials will be nullified."), 400)
         login_session['credentials'] = None
         login_session['gplus_id'] = None
         login_session['username'] = None
         response.headers['Content-type'] = 'application/json'
         return response
+
 
 @app.route('/view_entry/<int:id>/', methods=['GET'])
 def view_entry(id):
@@ -170,20 +181,22 @@ def view_entry(id):
 
     logged_in_options = ""
     if login_session.get('credentials') is not None:
-        logged_in_options += ("<a href="+ url_for('edit_entry', id=id)
-                              +">Edit</a> ")
-        logged_in_options += ("<a href="+ url_for('delete_entry', id=id)
-                              +">Delete</a>")
+        logged_in_options += ("<a href=" + url_for('edit_entry', id=id) +
+                              ">Edit</a> ")
+        logged_in_options += ("<a href=" + url_for('delete_entry', id=id) +
+                              ">Delete</a>")
 
     return render_template('view_book_info.html', entry=entry,
                            displayed_year=displayed_year,
                            logged_in_options=logged_in_options)
+
 
 @app.route('/view_entry/<int:id>/json', methods=['GET'])
 def view_json(id):
     entry = session.query(Book).filter_by(id=id).one()
     entry_json = jsonify(Book=entry.serialize)
     return entry_json
+
 
 @app.route('/view_entry/<int:id>/edit/', methods=['GET', 'POST'])
 def edit_entry(id):
@@ -200,6 +213,7 @@ def edit_entry(id):
 
     return render_template('edit_entry.html', entry=entry)
 
+
 @app.route('/view_entry/<int:id>/delete/', methods=['GET', 'POST'])
 def delete_entry(id):
     entry = session.query(Book).filter_by(id=id).one()
@@ -214,6 +228,7 @@ def delete_entry(id):
             print(entry.id)
             return redirect(url_for('view_entry', id=entry.id))
     return render_template('delete_entry.html', entry=entry)
+
 
 @app.route('/new_entry', methods=['GET', 'POST'])
 def create_entry():
