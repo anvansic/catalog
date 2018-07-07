@@ -3,7 +3,7 @@ from flask import (Flask, render_template, Markup, request, redirect, url_for,
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
-from models import Base, Book
+from models import Base, Book, User
 from flask import session as login_session
 import random
 import string
@@ -128,11 +128,26 @@ def gconnect():
 
     if data['name'] == '':
         login_session['username'] = data['email']
+        # Add the user to the User table if they don't have an entry yet.
+        user = (session.query(User).
+                filter_by(username=login_session['username']).first())
+        if user is None:
+            newUser = User(username=login_session['username'])
+            print(newUser)
+            session.add(newUser)
+            session.commit()
         return ("You have signed in with the e-mail %s"
                 % login_session['username'])
 
     else:
         login_session['username'] = data['name']
+        # Add the user to the User table if they don't have an entry yet.
+        user = (session.query(User).
+                filter_by(username=login_session['username']).first())
+        if user is None:
+            newUser = User(username=login_session['username'])
+            session.add(newUser)
+            session.commit()
         return "You are now signed in as %s" % login_session['username']
 
 
@@ -202,6 +217,22 @@ def view_json(id):
 def edit_entry(id):
     entry = session.query(Book).filter_by(id=id).one()
     if request.method == 'POST':
+
+        # Check to see if the user is logged in.
+        if login_session.get('credentials') is None:
+            return redirect(url_for('login_user'))
+
+        # Check to ensure that the user created the entry so that they are
+        # permitted to edit it.
+        user = (session.query(User).
+                filter_by(username=login_session['username']).one())
+
+        if entry.creator_id != user.id:
+            response = make_response(json.dumps("Not authorized."), 400)
+            response.headers['Content-type'] = 'application/json'
+            return response
+
+        # Make the edit changes.
         entry.title = request.values['title']
         entry.author = request.values['author']
         entry.year = request.values['year']
@@ -219,6 +250,21 @@ def delete_entry(id):
     entry = session.query(Book).filter_by(id=id).one()
 
     if request.method == 'POST':
+        # Check to see if the user is logged in.
+        if login_session.get('credentials') is None:
+            return redirect(url_for('login_user'))
+
+        # Check to ensure that the user created the entry so that they are
+        # permitted to delete it.
+        user = (session.query(User).
+                filter_by(username=login_session['username']).one())
+
+        if entry.creator_id != user.id:
+            response = make_response(json.dumps("Not authorized."), 400)
+            response.headers['Content-type'] = 'application/json'
+            return response
+
+        # Delete the entry.
         request_json = jsonify(request.values)
         if "Yes" in request_json.get_data():
             session.delete(entry)
@@ -233,11 +279,22 @@ def delete_entry(id):
 @app.route('/new_entry', methods=['GET', 'POST'])
 def create_entry():
     if request.method == 'POST':
+
+        # Check to see if the user is logged in.
+        if login_session.get('credentials') is None:
+            return redirect(url_for('login_user'))
+
+        user = (session.query(User).
+                filter_by(username=login_session['username']).first())
+
+        # Add the entry to the Book table with information from the HTML form
+        # and the user's id from the User table.
         newEntry = Book(title=request.values['title'],
                         author=request.values['author'],
                         year=int(request.values['year']),
                         genre=request.values['genre'],
-                        synopsis=request.values['synopsis'])
+                        synopsis=request.values['synopsis'],
+                        creator_id=user.id)
         session.add(newEntry)
         session.commit()
         return redirect(url_for('go_home'))
